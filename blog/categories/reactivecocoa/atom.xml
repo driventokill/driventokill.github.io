@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Reactivecocoa | My Octopress Blog]]></title>
+  <link href="http://yoursite.com/blog/categories/reactivecocoa/atom.xml" rel="self"/>
+  <link href="http://yoursite.com/"/>
+  <updated>2014-11-22T05:56:55+08:00</updated>
+  <id>http://yoursite.com/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[函数式编程的逆袭]]></title>
+    <link href="http://yoursite.com/blog/2014/11/22/han-shu-shi-bian-cheng-de-ni-xi/"/>
+    <updated>2014-11-22T05:49:48+08:00</updated>
+    <id>http://yoursite.com/blog/2014/11/22/han-shu-shi-bian-cheng-de-ni-xi</id>
+    <content type="html"><![CDATA[<p>很早以前就写过一段时间js，不过一直没有特别认真的去想过这个问题。我们总是拿趁手的工具去解决问题，当手头有一个非常全面的工具的时候（哪怕他有的时候没有那么锋利），往往会制约你去探索新的东西，因为你每时每刻都接触着它，被它禁锢了思考的方式。就像Windows用户永远也不会明白那些使用别的操作系统的人是为了什么，相信有一天，使用Mac的用户也会这么想。</p>
+
+<p>几个月前接触到<a href="https://github.com/ReactiveCocoa/ReactiveCocoa">ReactiveCocoa</a>，可能是因为写了太久命令式编程，第一感觉就是各种操作通过数据（信号、事件）来触发，而不是我写出来的一条条指令语句。不过我还是能感觉的到在这个过程中的那种非常自然的感觉，本来处理的逻辑就是这样，数据来了你就对数据进行各种加工然后送到下一个地方去，而不是去维护运行的各种状态，小心的修改着各种共享的变量。</p>
+
+<p>所以我又仔细的看了一下，原来它不是某野路子出来的，背后是<a href="http://en.wikipedia.org/wiki/Reactive_programming">Reactive Programming</a>的一个范式<a href="http://en.wikipedia.org/wiki/Functional_reactive_programming">Functional Reactive Programming</a>。而<a href="http://en.wikipedia.org/wiki/Reactive_programming">Reactive Programming</a>正是面向数据流的改变和传播，而FRP是用一个个的函数去做这些操作，用数据的流向把一个个的函数串起来，这个搭配太完美了，真有点天造地设的感觉。</p>
+
+<p>得益于OC灵活的语法，<a href="https://github.com/ReactiveCocoa/ReactiveCocoa">ReactiveCocoa</a>和各种控件融合的如鱼得水，为了让内容更紧凑点，我把例子都放在了最后，其实这主要就是记录我的感受，例子在github上都非常详尽，并不是那么重要。</p>
+
+<p>在这同时我也看了Java上的实现<a href="https://github.com/ReactiveX/RxJava">RxJava</a>，实际上主流的语言都有相应的实现<a href="http://reactivex.io/">ReactiveX</a>。在Android也有一个专门的绑定<a href="https://github.com/ReactiveX/RxAndroid">RxAndroid</a>，主要是方便在Android里面使用RxJava。</p>
+
+<p>在这之后我又去看完了<a href="http://book.douban.com/subject/21459993">Clojure程序设计</a>，而这个里面更是毫无阻滞的<a href="http://en.wikipedia.org/wiki/Functional_programming">FP</a>（关于<a href="http://en.wikipedia.org/wiki/Functional_programming">FP</a>的各种特性到处都是，要全面了解的文章一搜一大堆，我只从自己的感受出发），能非常自然的把你的逻辑进行合理的切分，甚至有点被强迫的感觉，因为要是哪个函数不合理，那么调用的时候会各种不舒服。而在面向对象中，大部分时候都是可以把丑陋的东西关在对象里的。所以这个特别适合用来描述你的想法，当你的想法、逻辑都被描述出来以后，剩下的那些状态就非常清楚了，哪些是全局需要的，哪些只是临时存在的，都很清楚。</p>
+
+<p>而当我们面向对象的时候往往是相反的过程，先弄出一堆对象来，然后看怎么把他们组合起来，然后总是会碰到一些类似的问题，然后我们把这些类似的问题总结起来，变成套路，再给它们命上名，各种<a href="https://en.wikipedia.org/wiki/Software_design_pattern">设计模式</a>就这么来了。</p>
+
+<p><a href="https://github.com/ReactiveCocoa/ReactiveCocoa">ReactiveCocoa</a>的一个例子，处理多个状态，本来的实现可能是这样：</p>
+
+<pre><code>        static void *ObservationContext = &amp;ObservationContext;
+
+        - (void)viewDidLoad {
+            [super viewDidLoad];
+
+            [LoginManager.sharedManager addObserver:self forKeyPath:@"loggingIn" options:NSKeyValueObservingOptionInitial context:&amp;ObservationContext];
+            [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(loggedOut:) name:UserDidLogOutNotification object:LoginManager.sharedManager];
+
+            [self.usernameTextField addTarget:self action:@selector(updateLogInButton) forControlEvents:UIControlEventEditingChanged];
+            [self.passwordTextField addTarget:self action:@selector(updateLogInButton) forControlEvents:UIControlEventEditingChanged];
+            [self.logInButton addTarget:self action:@selector(logInPressed:) forControlEvents:UIControlEventTouchUpInside];
+        }
+
+        - (void)dealloc {
+            [LoginManager.sharedManager removeObserver:self forKeyPath:@"loggingIn" context:ObservationContext];
+            [NSNotificationCenter.defaultCenter removeObserver:self];
+        }
+
+        - (void)updateLogInButton {
+            BOOL textFieldsNonEmpty = self.usernameTextField.text.length &gt; 0 &amp;&amp; self.passwordTextField.text.length &gt; 0;
+            BOOL readyToLogIn = !LoginManager.sharedManager.isLoggingIn &amp;&amp; !self.loggedIn;
+            self.logInButton.enabled = textFieldsNonEmpty &amp;&amp; readyToLogIn;
+        }
+
+        - (IBAction)logInPressed:(UIButton *)sender {
+            [[LoginManager sharedManager]
+                logInWithUsername:self.usernameTextField.text
+                password:self.passwordTextField.text
+                success:^{
+                    self.loggedIn = YES;
+                } failure:^(NSError *error) {
+                    [self presentError:error];
+                }];
+        }
+
+        - (void)loggedOut:(NSNotification *)notification {
+            self.loggedIn = NO;
+        }
+
+        - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+            if (context == ObservationContext) {
+                [self updateLogInButton];
+            } else {
+                [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+            }
+        }
+</code></pre>
+
+<p>使用<a href="https://github.com/ReactiveCocoa/ReactiveCocoa">ReactiveCocoa</a>以后：</p>
+
+<pre><code>        - (void)viewDidLoad {
+            [super viewDidLoad];
+
+            @weakify(self);
+
+            RAC(self.logInButton, enabled) = [RACSignal
+                combineLatest:@[
+                    self.usernameTextField.rac_textSignal,
+                    self.passwordTextField.rac_textSignal,
+                    RACObserve(LoginManager.sharedManager, loggingIn),
+                    RACObserve(self, loggedIn)
+                ] reduce:^(NSString *username, NSString *password, NSNumber *loggingIn, NSNumber *loggedIn) {
+                    return @(username.length &gt; 0 &amp;&amp; password.length &gt; 0 &amp;&amp; !loggingIn.boolValue &amp;&amp; !loggedIn.boolValue);
+                }];
+
+            [[self.logInButton rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(UIButton *sender) {
+                @strongify(self);
+
+                RACSignal *loginSignal = [LoginManager.sharedManager
+                    logInWithUsername:self.usernameTextField.text
+                    password:self.passwordTextField.text];
+
+                    [loginSignal subscribeError:^(NSError *error) {
+                        @strongify(self);
+                        [self presentError:error];
+                    } completed:^{
+                        @strongify(self);
+                        self.loggedIn = YES;
+                    }];
+            }];
+
+            RAC(self, loggedIn) = [[NSNotificationCenter.defaultCenter
+                rac_addObserverForName:UserDidLogOutNotification object:nil]
+                mapReplace:@NO];
+        }
+</code></pre>
+
+<p>将我们从每次操作检查各种状态中解脱出来，变成了当状态改变到满足条件时，就去做触发某些事情。10年前，我们各种网页、软件的交互可能就是把一个大form在前端展示和提交到后端，而现在的App交互非常灵活，会有各种事件交织在一起，用代码去描述处理的逻辑总比一堆if去检查各种状态来决定要不要处理要好的多。</p>
+
+<p>RxJava简单的例子，更多的例子可以直接在<a href="https://github.com/ReactiveX/RxJava/wiki">RxJava Wiki</a>中找到，里面的图片描述的实在是太形象了，很少见到这么高质量的文档：</p>
+
+<pre><code>        Observable&lt;String&gt; strings = Observable.create(
+                (Subscriber&lt;? super String&gt; subscriber) -&gt; {
+                    subscriber.onNext("Hello");
+                    subscriber.onNext("World");
+                    subscriber.onCompleted();
+                }
+        );
+        strings.map(str -&gt; str.length())
+               .subscribe(length -&gt; toast("length is " + length));
+</code></pre>
+
+<p>这就是对怎么处理数据的描述，如果用for来写这段代码，事情是干了，但是绝对没有这么清晰的逻辑意图在里面。</p>
+
+<p>RxAndroid图片加载的例子（lambda表达式可以通过<a href="https://github.com/orfjackal/retrolambda">Retrolambda</a>在Dalvik虚拟机中支持）：</p>
+
+<ol>
+<li><p>同步执行，但是会阻塞UI线程</p>
+
+<pre><code>         Observable&lt;Bitmap&gt; imageObservable = Observable.create(observer -&gt; {
+             Bitmap bm = downloadBitmap();
+             return bm;
+         });
+         imageObservable.subscribe(image -&gt; loadToImageView(image));
+</code></pre></li>
+<li><p>异步执行，但是loadToImageView没有在UI线程调用</p>
+
+<pre><code>          imageObservable
+                 .subscribeOn(Schedulers.newThread())
+                 .subscribe(image -&gt; loadToImageView(image));
+</code></pre></li>
+<li><p>简洁的异步操作</p>
+
+<pre><code>          imageObservable
+                 .subscribeOn(Schedulers.newThread())
+                 .observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(image -&gt; loadToImageView(image));
+</code></pre></li>
+</ol>
+
+
+<p>处理图片点击事件：</p>
+
+<pre><code>        public static &lt;T extends View&gt; Observable&lt;T&gt; clicksFrom(T view) {
+            PublishSubject publishSubject = PublishSubject.create();
+            view.setOnClickListener((v) -&gt; publishSubject.onNext(view));
+            return publishSubject.asObservable();
+        }
+</code></pre>
+
+<pre><code>        clicksFrom(button).subscribe(view -&gt; toast("clicked"));
+</code></pre>
+
+<pre><code>        final ImageView imageView = (ImageView) findViewById(R.id.image);
+
+        Observable&lt;Bitmap&gt; imageObservable =
+                Async.start(() -&gt; loadImage(), Schedulers.io())
+                        .cache()
+                        .observeOn(AndroidSchedulers.mainThread());
+
+        //show loaded imageObservable
+        imageObservable.subscribe((Bitmap image) -&gt; imageView.setImageBitmap(image));
+
+        //handle imageView clicks
+        imageObservable
+                .flatMap(image -&gt; clicksFrom(imageView).map((ImageView view) -&gt; image))
+                .subscribe((Bitmap image) -&gt; processImage(image));
+</code></pre>
+
+<p>没有状态，没有命名空间污染，没有条件分支</p>
+
+<p>更多的关于Android上的实践可以看这里<a href="https://github.com/ReactiveX/RxJava/wiki/The-RxJava-Android-Module">RxJava-Android-Module</a>最下面列出来的一堆，都很不错。</p>
+]]></content>
+  </entry>
+  
+</feed>
