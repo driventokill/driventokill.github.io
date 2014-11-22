@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Reactivecocoa | My Octopress Blog]]></title>
-  <link href="http://yoursite.com/blog/categories/reactivecocoa/atom.xml" rel="self"/>
-  <link href="http://yoursite.com/"/>
-  <updated>2014-11-22T05:56:55+08:00</updated>
-  <id>http://yoursite.com/</id>
+  <title><![CDATA[Category: reactivecocoa | XIII]]></title>
+  <link href="http://driventokill.github.io/blog/categories/reactivecocoa/atom.xml" rel="self"/>
+  <link href="http://driventokill.github.io/"/>
+  <updated>2014-11-22T13:45:43+08:00</updated>
+  <id>http://driventokill.github.io/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[fyXIII]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[函数式编程的逆袭]]></title>
-    <link href="http://yoursite.com/blog/2014/11/22/han-shu-shi-bian-cheng-de-ni-xi/"/>
+    <link href="http://driventokill.github.io/blog/2014/11/22/han-shu-shi-bian-cheng-de-ni-xi/"/>
     <updated>2014-11-22T05:49:48+08:00</updated>
-    <id>http://yoursite.com/blog/2014/11/22/han-shu-shi-bian-cheng-de-ni-xi</id>
+    <id>http://driventokill.github.io/blog/2014/11/22/han-shu-shi-bian-cheng-de-ni-xi</id>
     <content type="html"><![CDATA[<p>很早以前就写过一段时间js，不过一直没有特别认真的去想过这个问题。我们总是拿趁手的工具去解决问题，当手头有一个非常全面的工具的时候（哪怕他有的时候没有那么锋利），往往会制约你去探索新的东西，因为你每时每刻都接触着它，被它禁锢了思考的方式。就像Windows用户永远也不会明白那些使用别的操作系统的人是为了什么，相信有一天，使用Mac的用户也会这么想。</p>
 
 <p>几个月前接触到<a href="https://github.com/ReactiveCocoa/ReactiveCocoa">ReactiveCocoa</a>，可能是因为写了太久命令式编程，第一感觉就是各种操作通过数据（信号、事件）来触发，而不是我写出来的一条条指令语句。不过我还是能感觉的到在这个过程中的那种非常自然的感觉，本来处理的逻辑就是这样，数据来了你就对数据进行各种加工然后送到下一个地方去，而不是去维护运行的各种状态，小心的修改着各种共享的变量。</p>
