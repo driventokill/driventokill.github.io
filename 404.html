@@ -35,13 +35,29 @@
 </head>
 
 <body   class="no-sidebar"  >
-  <header role="banner"><hgroup>
-  <h1>XIII</h1>
+  <header role="banner"><div id="header">
+  <h1><a href="/">XIII</a></h1>
   
-    <h2><a href="/">FY</a></h2>
+    <p>FY</p>
   
-</hgroup>
+</div>
+<ul id="social-links">
+  
+    <li><a class="feed" href="/atom.xml" title="RSS">RSS</a></li>
+  
+  
+  
+</ul>
+<div class="clear"></div>
+<ul id="nav">
+  
+    <li> <a href="/">blog</a> </li>
+  
 
+  
+    <li><a href="/blog/archives">archives</a></li>
+  
+</ul>
 </header>
   <nav role="navigation">
   
@@ -92,11 +108,36 @@
 
     </div>
   </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - fyXIII -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
+  <footer role="contentinfo"><div id="footer">
+  <div class="panels">
+    <div class="license">
+      <h2>License</h2>
+      <p>如非特别声明，本 Blog 的文章由 fyXIII 创作，采用<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">知识共享署名-非商业性使用-相同方式共享 3.0 Unported 许可协议</a>进行许可。</p>
+    </div>
 
+    <div class="posts">
+      <h2>Recent Posts</h2>
+      <ul>
+        
+          <li>
+            <a href="/blog/2014/11/22/han-shu-shi-bian-cheng-de-ni-xi/">函数式编程的逆袭</a>
+          </li>
+        
+      </ul>
+    </div>
+
+    <div class="douban">
+      <h2>Reading</h2>
+      
+        <p>Please set your Douban ID in _config.yml</p>
+      
+    </div>
+  </div>
+
+  <p class="powered">
+    Powered by <a href="http://octopress.org">Octopress</a> and <a href="https://github.com/iwinux/compbits">Compbits</a>
+  </p>
+</div>
 </footer>
   
 
